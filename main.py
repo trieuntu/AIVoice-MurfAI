@@ -1,15 +1,45 @@
-
 import flet as ft
 import requests
 import os
 import pathlib
 from murf import Murf
-try:
-    from api_key import API_KEY
-except ImportError:
-    API_KEY = "" # Để trống nếu không tìm thấy file
+import sys 
 
-client = None 
+API_KEY = "" # Khởi tạo là chuỗi rỗng
+client = None
+
+def load_api_key_from_file():
+    """Đọc API Key từ file api_key.py cùng cấp với file thực thi."""
+    try:
+        if getattr(sys, 'frozen', False):
+            base_path = pathlib.Path(sys.executable).parent
+        else:
+            base_path = pathlib.Path(__file__).parent
+
+        api_key_file_path = base_path / "api_key.py"
+        print(f"Đang tìm file API Key tại: {api_key_file_path}") 
+
+        if api_key_file_path.is_file():
+            with open(api_key_file_path, "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith("API_KEY") and "=" in line:
+                        parts = line.split("=", 1) 
+                        key_value = parts[1].strip()
+                        if (key_value.startswith('"') and key_value.endswith('"')) or \
+                           (key_value.startswith("'") and key_value.endswith("'")):
+                            return key_value[1:-1] 
+                        else:
+                            return key_value 
+            print("Tìm thấy file api_key.py nhưng không tìm thấy dòng 'API_KEY = ...'")
+            return "" 
+        else:
+            print(f"Không tìm thấy file {api_key_file_path}")
+            return "" 
+    except Exception as e:
+        print(f"Lỗi khi đọc file api_key.py: {e}")
+        return "" 
+
 def initialize_murf_client(api_key):
     global client
     if not api_key:
@@ -26,7 +56,9 @@ def initialize_murf_client(api_key):
         client = None
         return False, f"Lỗi API: {e}"
 
-initialize_murf_client(API_KEY)
+print("Đang tải API Key...")
+API_KEY = load_api_key_from_file() 
+initialize_murf_client(API_KEY) 
 
   
 # --- TỰ ĐỘNG LẤY VÀ LỌC VOICE TIẾNG ANH ---
@@ -67,7 +99,7 @@ if not VOICE_MOODS:
 
 # Build the Flet App
 def main(page: ft.Page):
-    page.title = "AI Voice Generator-Nguyen Giap High School"
+    page.title = "AI Voice Generator-Vo Nguyen Giap High School"
     page.window_icon = "assets/icon.png"
     page.vertical_alignment = ft.MainAxisAlignment.START # Đổi thành Start để nút cài đặt ở trên
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
