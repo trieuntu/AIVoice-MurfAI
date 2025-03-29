@@ -71,6 +71,45 @@ A simple desktop application built with Python and Flet to generate AI voice fro
     *   A file dialog will appear; choose a location and filename to save the MP3 file.
     *   The audio file will play automatically after saving.
 
+## Packaging for Windows
+
+You can package this application into a standalone Windows executable (`.exe`) using Flet's built-in packaging tool (which utilizes PyInstaller). This allows users to run the application without needing Python or installing dependencies.
+
+**Prerequisites:**
+
+*   Ensure the application runs correctly using `python main.py`.
+*   Have an icon file ready, preferably in `.ico` format for best results on Windows (e.g., `assets/favicon.ico`).
+
+**Steps:**
+
+1.  Open your **Terminal**, **Command Prompt**, or **PowerShell**.
+2.  Navigate (`cd`) to the root directory of your project (where `main.py` is located).
+3.  **Activate your virtual environment** (if you are using one):
+    ```bash
+    # Windows Command Prompt / PowerShell
+    .\venv\Scripts\activate
+    ```
+4.  Run the `flet pack` command. Use the command that worked successfully for you:
+    ```bash
+    flet pack main.py --name "AIVoiceGenerator" --icon "assets/favicon.ico" --add-data "assets;assets" --add-data "api_key.py;."
+    ```
+    *   `main.py`: Your main application script.
+    *   `--name "AIVoiceGenerator"`: Sets the name of the executable and the output folder.
+    *   `--icon "assets/favicon.ico"`: Specifies the icon file for the `.exe`.
+    *   `--add-data "assets;assets"`: Bundles the entire `assets` folder into the package, making `assets/favicon.ico` (for the window icon) accessible.
+    *   `--add-data "api_key.py;."`: Bundles the `api_key.py` file into the root directory of the package, allowing the application to read it on startup and potentially overwrite it.
+
+5.  **Wait for the process to complete.** This might take several minutes. Ignore warnings unless there are specific errors.
+
+6.  **Find the Result:** Once finished, you'll find the packaged application inside the `dist` directory, within a sub-folder named after your `--name` argument (e.g., `dist/AIVoiceGenerator`).
+
+**Running the Packaged App:**
+
+*   Navigate into the `dist/AIVoiceGenerator` folder.
+*   Double-click the `AIVoiceGenerator.exe` file to run the application.
+*   You can copy the entire `AIVoiceGenerator` folder to another Windows machine (even one without Python installed) and run the `.exe` from there.
+
+
 ## Technology Stack
 
 *   **[Flet](https://flet.dev/)**: Build cross-platform Flutter frontends in Python.
